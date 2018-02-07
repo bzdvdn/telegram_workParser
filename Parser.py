@@ -29,8 +29,9 @@ class Parser(object):
 							 data['company'],
 							 data['city'],
 							 data['employment'],
-							 data['description'],
-							 data['url']
+							 data['url'],
+							 data['skills'],
+							 data['mb_skills'],
 							 ))
 
 	def get_pages_data(self, html):
@@ -52,11 +53,19 @@ class Parser(object):
 					desc_soup = BeautifulSoup(page, 'lxml')
 					company = desc_soup.find('dl', class_='dl-horizontal').find('a').find('b').get_text().strip()
 					city = desc_soup.find('dl', class_='dl-horizontal').findAll('dd')[-2].get_text().strip()
-					employment = desc_soup.find('dl', class_='dl-horizontal').findAll('dd')[-1].get_text().strip()
-					description = desc_soup.find('div', class_='wordwrap').get_text().strip()
+					employment = desc_soup.find('dl', class_='dl-horizontal').findAll('dd')[-1].get_text().strip()	
 				except Exception as e:
 					print(e)
 					continue
+				try:
+					skills = soup.find('div', class_='wordwrap').find('ul').get_text()
+				except:
+					skills = ''
+				try:
+					mb_skills = soup.find('div', class_='wordwrap').find_all('ul')[1].get_text()
+				except:
+					mb_skills = ''
+					
 
 
 				data = {
@@ -64,8 +73,10 @@ class Parser(object):
 						'company': company,
 						'city': city,
 						'employment': employment,
-						'description': description,
-						'url': url										
+						'url': url,
+						'skills': skills,
+						'mb_skills':mb_skills,
+																
 				}
 			
 				# result = []

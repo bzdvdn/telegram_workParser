@@ -18,15 +18,23 @@ class WorkParser(Parser):
 					print(e)
 					continue
 				try:
-					page = self.get_html(url, useragent)
+					page = self.get_html(url)
 					desc_soup = BeautifulSoup(page, 'lxml')
 					company = desc_soup.find('dl', class_='dl-horizontal').find('a').find('b').get_text().strip()
 					city = desc_soup.find('dl', class_='dl-horizontal').findAll('dd')[-2].get_text().strip()
-					employment = desc_soup.find('dl', class_='dl-horizontal').findAll('dd')[-1].get_text().strip()
-					description = desc_soup.find('div', class_='wordwrap').get_text().strip()
+					employment = desc_soup.find('dl', class_='dl-horizontal').findAll('dd')[-1].get_text().strip()	
 				except Exception as e:
 					print(e)
 					continue
+				try:
+					skills = desc_soup.find('div', class_='wordwrap').find('ul').get_text()
+				except:
+					skills = ''
+				try:
+					mb_skills = desc_soup.find('div', class_='wordwrap').find_all('ul')[1].get_text()
+				except:
+					mb_skills = ''
+					
 
 
 				data = {
@@ -35,7 +43,8 @@ class WorkParser(Parser):
 						'city': city,
 						'employment': employment,
 						'url': url,
-						'description': description
+						'skills': skills,
+						'mb_skills':mb_skills,
 																
 				}
 			

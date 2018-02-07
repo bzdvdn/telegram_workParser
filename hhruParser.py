@@ -14,13 +14,13 @@ class HHruParser(Parser):
 		with open(str(self.chat_id) + '_-_' + str(self.message) + '.csv', 'a') as f:
 			writer = csv.writer(f, dialect='excel', quotechar='"',  quoting=csv.QUOTE_ALL)
 			writer.writerow((data['title'],
-							 data['publicated'],
 							 data['company'],
 							 data['city'],
 							 data['exp'],
 							 data['employment'],
 							 data['url'],
-							 data['description']
+							 data['skills'],
+							 data['work']
 							 ))
 
 	def get_pages_data(self, html):
@@ -47,19 +47,28 @@ class HHruParser(Parser):
 					desc_soup = BeautifulSoup(page, 'lxml')
 					exp = desc_soup.find('div', class_="vacancy__info").find_all('div')[-2].text.strip()
 					employment = desc_soup.find('div', class_="vacancy__info").find_all('div')[-1].text.strip()
-					description = desc_soup.find_all('div', class_='vacancy__cell')[2].get_text()
 				except Exception as e:
 					print(e)
 					continue
+				try:
+					skills = desc_soup.find('div', class_='vacancy__description usergenerate').find_all('ul')[1].get_text()
+				except:
+					skills = ''
+
+				try:
+					work = desc_soup.find('div', class_='vacancy__description usergenerate').find_all('ul')[0].get_text()
+				except:
+					work = ''	
+
 
 				data = {
-						'title': title,
-						'publicated': publicated,
+						'title': title + '--' + publicated,
 						'company': company,
 						'city': city,
 						'exp': exp,
 						'employment': employment,
-						'description': description,
+						'skills': skills,
+						'work': work,
 						'url': url										
 				}
 			
