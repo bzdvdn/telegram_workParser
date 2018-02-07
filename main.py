@@ -1,36 +1,23 @@
 import telebot
 import os
 import glob
-import config
-from datetime import datetime
+from flask import Flask
+from flask import request
+import config as config
 from workParser import workparse
 from hhruParser import hhru_parse
 
 __author__ = 'bzdvdn'
 
-token = config.token
-# print(token)
 
-bot = telebot.TeleBot(token)
 
-# bot.send_message(394828462, 'Hello')
+bot = telebot.TeleBot(config.token)
+bot.remove_webhook()
+bot.set_webhook(url='Your url')
 
-# upd = bot.get_updates()
-# print(upd)
-
-# last_upd = upd[-1]
-# message_from_user = last_upd.message
-# print(message_from_user)
 print(bot.get_me())
 
-# def log(message, answer):
-# 	print('\n'+ '='*8)
-# 	print(datetime.now())
-# 	print("Сообщение от {0} {1}. (id = {2}) \n Текст = {3}".format(message.from_user.first_name,
-# 															       message.from_user.last_name,
-# 															       str(message.from_user.id),
-# 															       message.text))
-# 	print(answer)
+
 
 def delete_file(filename):
 	glb = glob.glob('./*.csv')
@@ -45,6 +32,26 @@ def work_parser(message,parser):
 		delete_file(str(message.from_user.id)  + '_-_' + str(message.text) + '.csv')
 	else:
 		bot.register_next_step_handler(parser, start_command)
+
+
+
+
+app = Flask(__name__)
+app.config.from_object(config)
+
+@app.route('/', methods=['POST', 'GET'])
+def index():
+    if request.method == 'POST':
+        r = request.get_json()
+        update = telebot.types.Update.de_json(r)
+        bot.process_new_updates([update])
+        return ''
+
+    return '<h1> Bot welcomes you</h1>'
+
+
+
+
 
 @bot.message_handler(commands=['help'])
 def handle_text(message):
@@ -96,8 +103,10 @@ def stop_command(message):
 
 
 
+if __name__=='__main__':
+    app.run()
 
 
 
 
-bot.polling(none_stop=True, interval=0)	
+#bot.polling(none_stop=True, interval=0)	
