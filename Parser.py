@@ -33,6 +33,7 @@ class Parser(object):
 							 data['skills'],
 							 data['mb_skills'],
 							 ))
+			print(data['title'], ' parsed!')
 
 	def get_pages_data(self, html):
 		soup = BeautifulSoup(html, "lxml")
@@ -58,11 +59,11 @@ class Parser(object):
 					print(e)
 					continue
 				try:
-					skills = soup.find('div', class_='wordwrap').find('ul').get_text()
+					skills = desc_soup.find('div', class_='wordwrap').find('ul').get_text()
 				except:
 					skills = ''
 				try:
-					mb_skills = soup.find('div', class_='wordwrap').find_all('ul')[1].get_text()
+					mb_skills = desc_soup.find('div', class_='wordwrap').find_all('ul')[1].get_text()
 				except:
 					mb_skills = ''
 					
@@ -82,7 +83,7 @@ class Parser(object):
 				# result = []
 				# result.append(data)
 				# print(result)
-				self.write_csv(data, str(self.message), str(chat_id))
+				self.write_csv(data, str(self.message), str(self.chat_id))
 				#print(json.dumps(data,indent=2, ensure_ascii=False))
 			else:
 				continue

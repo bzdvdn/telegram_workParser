@@ -10,25 +10,14 @@ class HHruParser(Parser):
 		total_pages = int(pages.split('=')[-1]) + 1
 		return int(total_pages)
 
-	def write_csv(self, data,message,chat_id):
-		with open(str(self.chat_id) + '_-_' + str(self.message) + '.csv', 'a') as f:
-			writer = csv.writer(f, dialect='excel', quotechar='"',  quoting=csv.QUOTE_ALL)
-			writer.writerow((data['title'],
-							 data['company'],
-							 data['city'],
-							 data['exp'],
-							 data['employment'],
-							 data['url'],
-							 data['skills'],
-							 data['work']
-							 ))
+
 
 	def get_pages_data(self, html):
 		soup = BeautifulSoup(html, "lxml")
 		ads = soup.find_all('li', class_='vacancy-short')
 
 		for index, iterator in enumerate(ads):
-			name = soup.find('div', class_='vacancy-short__name').text.strip().lower()
+			name = iterator.find('div', class_='vacancy-short__name').text.strip().lower()
 
 			if str(self.message).lower() in name:
 				try:
@@ -56,19 +45,18 @@ class HHruParser(Parser):
 					skills = ''
 
 				try:
-					work = desc_soup.find('div', class_='vacancy__description usergenerate').find_all('ul')[0].get_text()
+					mb_skills = desc_soup.find('div', class_='vacancy__description usergenerate').find_all('ul')[0].get_text()
 				except:
-					work = ''	
+					mb_skills = ''	
 
 
 				data = {
-						'title': title + '--' + publicated,
+						'title': title + '--' + publicated + '--' + exp,
 						'company': company,
 						'city': city,
-						'exp': exp,
 						'employment': employment,
 						'skills': skills,
-						'work': work,
+						'mb_skills': mb_skills,
 						'url': url										
 				}
 			
@@ -86,7 +74,7 @@ def hhru_parse(msg, chat_id):
 		total_pages = p.get_total_pages(p.get_html(url,useragent))
 		
 
-		for i in range(1, 2):
+		for i in range(1, total_pages+1):
 			url_gen = base_url + page + str(i)
 			html = p.get_html(url_gen, useragent)
 			p.get_pages_data(html)

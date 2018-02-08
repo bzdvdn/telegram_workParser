@@ -1,26 +1,26 @@
 import telebot
 import os
-import glob
 from flask import Flask
 from flask import request
+from flask_sslify import SSLify
 import config as config
 from workParser import workparse
 from hhruParser import hhru_parse
+from rabotauaParser import rabotaua_parser
 
 __author__ = 'bzdvdn'
 
 
 
 bot = telebot.TeleBot(config.token)
-bot.remove_webhook()
-bot.set_webhook(url='Your url')
+# bot.remove_webhook()
+# bot.set_webhook(url='https://91967212.ngrok.io')
 
-print(bot.get_me())
+#print(bot.get_me())
 
 
 
 def delete_file(filename):
-	glb = glob.glob('./*.csv')
 	os.remove(filename)
 
 
@@ -37,21 +37,22 @@ def work_parser(message,parser):
 
 
 app = Flask(__name__)
+sslify = SSLify(app)
 app.config.from_object(config)
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-    if request.method == 'POST':
-        r = request.get_json()
-        update = telebot.types.Update.de_json(r)
-        bot.process_new_updates([update])
-        return ''
+	if request.method == 'POST':
+		r = request.get_json()
+		update = telebot.types.Update.de_json(r)
+		bot.process_new_updates([update])
+		return ''
 
-    return '<h1> Bot welcomes you</h1>'
-
-
+	return '<h1> Bot welcomes you</h1>'
 
 
+bot.remove_webhook()
+bot.set_webhook(url='https://8521b153.ngrok.io')
 
 @bot.message_handler(commands=['help'])
 def handle_text(message):
@@ -93,7 +94,14 @@ def work_ua_command(message):
 			parser = hhru_parse(message.text, message.from_user.id)
 			work_parser(message,parser)
 
-	
+	elif message.text == '/rabota_ua':
+		@bot.message_handler(content_types=['text'])
+		def handle_parser(message):
+			bot.send_message(message.from_user.id, 'Waiting for parsing data...')   
+			parser = rabotaua_parser(message.text, message.from_user.id)
+			work_parser(message,parser)
+
+
 
 
 @bot.message_handler(commands=['stop'])

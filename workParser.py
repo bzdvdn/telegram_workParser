@@ -1,60 +1,10 @@
-from Parser import *
+from Parser import Parser, read_file
+from random import choice
 
 __author__ = 'bzdvdn'
 
 class WorkParser(Parser):
-	def get_pages_data(self, html):
-		soup = BeautifulSoup(html, "lxml")
-		ads = soup.find_all('div', class_='card card-hover card-visited wordwrap job-link card-logotype')
-		for index, iterator in enumerate(ads):
-			name  = title = iterator.find('h2').find('a').get('title').strip().lower()
-
-			if str(self.message).lower() in name:
-				try:
-					title = iterator.find('h2').find('a').get('title').strip().lower()
-					url = 'https://www.work.ua' + iterator.find('h2').find('a').get('href')
-					print('{} - index, url - {}'.format(index,url))
-				except Exception as e:
-					print(e)
-					continue
-				try:
-					page = self.get_html(url)
-					desc_soup = BeautifulSoup(page, 'lxml')
-					company = desc_soup.find('dl', class_='dl-horizontal').find('a').find('b').get_text().strip()
-					city = desc_soup.find('dl', class_='dl-horizontal').findAll('dd')[-2].get_text().strip()
-					employment = desc_soup.find('dl', class_='dl-horizontal').findAll('dd')[-1].get_text().strip()	
-				except Exception as e:
-					print(e)
-					continue
-				try:
-					skills = desc_soup.find('div', class_='wordwrap').find('ul').get_text()
-				except:
-					skills = ''
-				try:
-					mb_skills = desc_soup.find('div', class_='wordwrap').find_all('ul')[1].get_text()
-				except:
-					mb_skills = ''
-					
-
-
-				data = {
-						'title': title,
-						'company': company,
-						'city': city,
-						'employment': employment,
-						'url': url,
-						'skills': skills,
-						'mb_skills':mb_skills,
-																
-				}
-			
-				# result = []
-				# result.append(data)
-				# print(result)
-				self.write_csv(data, str(self.message), str(self.chat_id))
-				#print(json.dumps(data,indent=2, ensure_ascii=False))
-			else:
-				continue
+	pass
 
 
 useragent = {'User-Agent': choice(read_file('useragent.txt'))}
