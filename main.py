@@ -4,9 +4,9 @@ from flask import Flask
 from flask import request
 from flask_sslify import SSLify
 import config as config
-from workParser import workparse
-from hhruParser import hhru_parse
-from rabotauaParser import rabotaua_parser
+from Parser import workparse
+from Parser import hhru_parse
+from Parser import rabotaua_parser
 
 __author__ = 'bzdvdn'
 
