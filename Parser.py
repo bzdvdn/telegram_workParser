@@ -5,10 +5,22 @@ from random import choice
 
 __author__ = 'bzdvdn'
 
+def read_file(filename):
+	with open(filename, 'r') as f:
+		return f.read().split('\n')
+
+
+useragent = {'User-Agent': choice(read_file('useragent.txt'))}
+
+
 class Parser(object):
-	def __init__(self, message, chat_id):
+	def __init__(self, url, page, message, chat_id):
 		self.message = message
+		self.url = url + str(self.message) + '/'
+		self.base_url = url + str(self.message) + '/'
+		self.page = page
 		self.chat_id = chat_id
+		self.workparse()
 
 	def get_html(self, url, user=None):
 		r = requests.get(url)
@@ -80,13 +92,22 @@ class Parser(object):
 																
 				}
 			
-				# result = []
-				# result.append(data)
-				# print(result)
 				self.write_csv(data, str(self.message), str(self.chat_id))
-				#print(json.dumps(data,indent=2, ensure_ascii=False))
 			else:
 				continue
+
+	def workparse(self):
+		#url = 'https://www.work.ua/jobs-' + self.message + '/'
+		#base_url = 'https://www.work.ua/jobs-' + self.message + '/?'
+		#page = 'page='
+		total_pages = self.get_total_pages(self.get_html(self.url))
+		
+
+		for i in range(1, total_pages+1):
+			url_gen = self.base_url + self.page + str(i)
+			html = self.get_html(url_gen, useragent)
+			self.get_pages_data(html)
+
 class HHruParser(Parser):
 
 	def get_total_pages(self, html):
@@ -180,7 +201,7 @@ class RabotauaParser(Parser):
 			except Exception as e:
 				print(e)
 			try:
-				employment = desc_soup.find('div', class_='d_content').find('div', class_='d_des').find_all('ul')[2].text
+				employment = desc_soup.find('div', class_='d_content').find('div', class_='d_des').find_all('ul')[2].text.strip()
 			except:
 				print('employment')
 				employment = '----'
@@ -213,57 +234,12 @@ class RabotauaParser(Parser):
 	
 			
 
-def read_file(filename):
-	with open(filename, 'r') as f:
-		return f.read().split('\n')
-
-
-useragent = {'User-Agent': choice(read_file('useragent.txt'))}
-
-def workparse(msg,chat_id):
-		p = Parser(msg,chat_id)
-		url = 'https://www.work.ua/jobs-' + p.message + '/'
-		base_url = 'https://www.work.ua/jobs-' + p.message + '/?'
-		page = 'page='
-		total_pages = p.get_total_pages(p.get_html(url))
-		
-
-		for i in range(1, total_pages+1):
-			url_gen = base_url + page + str(i)
-			html = p.get_html(url_gen, useragent)
-			p.get_pages_data(html)
-	
-
-
-def hhru_parse(msg, chat_id):
-		p = HHruParser(msg,chat_id)
-		url = 'https://m.hh.ru/vacancies?text=' + str(p.message)
-		base_url = 'https://m.hh.ru/vacancies?text=' + str(p.message) 
-		page = '&page='
-		total_pages = p.get_total_pages(p.get_html(url,useragent))
-		
-
-		for i in range(1, total_pages+1):
-			url_gen = base_url + page + str(i)
-			html = p.get_html(url_gen, useragent)
-			p.get_pages_data(html)
 
 
 
-
-def rabotaua_parser(msg, chat_id):
-		p = RabotauaParser(msg,chat_id)
-		url = 'https://rabota.ua/jobsearch/vacancy_list?keyWords=' + str(p.message)
-		base_url = 'https://rabota.ua/jobsearch/vacancy_list?keyWords=' + str(p.message) 
-		page = '&pg='
-		total_pages = p.get_total_pages(p.get_html(url,useragent))
-		
-
-		for i in range(1, 5):
-			url_gen = base_url + page + str(i)
-			html = p.get_html(url_gen, useragent)
-			p.get_pages_data(html)
+def main():
+	p = RabotauaParser(url='https://rabota.ua/jobsearch/vacancy_list?keyWords=', page='&pg=', message='python', chat_id='1111')
 
 
 if __name__ == '__main__':
-	rabotaua_parser('python', '2335345')
+	main()

@@ -4,9 +4,8 @@ from flask import Flask
 from flask import request
 from flask_sslify import SSLify
 import config as config
-from Parser import workparse
-from Parser import hhru_parse
-from Parser import rabotaua_parser
+from Parser import Parser, HHruParser, RabotauaParser
+
 
 __author__ = 'bzdvdn'
 
@@ -15,21 +14,8 @@ __author__ = 'bzdvdn'
 bot = telebot.TeleBot(config.token)
 
 bot.remove_webhook()
-bot.set_webhook(url='https://97104062.ngrok.io')
+bot.set_webhook(url='https://c5423e1f.ngrok.io')
 
-print(bot.get_me())
-
-
-
-def delete_file(filename):
-	os.remove(filename)
-
-
-def work_parser(message,parser):		
-		file = open(str(message.from_user.id) + '_-_' + str(message.text) + '.csv', 'rb')
-		bot.send_document(message.from_user.id, file)
-		delete_file(str(message.from_user.id)  + '_-_' + str(message.text) + '.csv')
-		
 
 
 
@@ -37,6 +23,11 @@ def work_parser(message,parser):
 app = Flask(__name__)
 sslify = SSLify(app)
 app.config.from_object(config)
+
+print(bot.get_me())
+
+def delete_file(filename):
+	os.remove(filename)
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -89,8 +80,8 @@ def work_ua_command(message):
 
 
 def work_parser(message):
-	bot.send_message(message.from_user.id, 'Данные парсятся, это может занять некоторое время....1')	
-	parser = workparse(message.text, message.from_user.id)			
+	bot.send_message(message.from_user.id, 'Данные парсятся, это может занять некоторое время....')	
+	p = Parser(url='https://www.work.ua/jobs-', page='page=',message=message.text, chat_id=message.from_user.id)			
 	file = open(str(message.from_user.id) + '_-_' + str(message.text) + '.csv', 'rb')
 	bot.send_document(message.from_user.id, file)
 	delete_file(str(message.from_user.id)  + '_-_' + str(message.text) + '.csv')
@@ -98,16 +89,16 @@ def work_parser(message):
 
 
 def hh_parser(message):
-	bot.send_message(message.from_user.id, 'Данные парсятся, это может занять некоторое время....2')	
-	parser = hhru_parse(message.text, message.from_user.id)			
+	bot.send_message(message.from_user.id, 'Данные парсятся, это может занять некоторое время....')	
+	p = HHruParser(url='https://m.hh.ru/vacancies?text=', page='&page=', message=message.text, chat_id=message.from_user.id)		
 	file = open(str(message.from_user.id) + '_-_' + str(message.text) + '.csv', 'rb')
 	bot.send_document(message.from_user.id, file)
 	delete_file(str(message.from_user.id)  + '_-_' + str(message.text) + '.csv')
 	msg = bot.send_message(message.from_user.id, 'Готово! Для дальнейшей работы нажмите "/start"')
 
 def rabota_parser(message):
-	bot.send_message(message.from_user.id, 'Данные парсятся, это может занять некоторое время....3')	
-	parser = rabotaua_parser(message.text, message.from_user.id)			
+	bot.send_message(message.from_user.id, 'Данные парсятся, это может занять некоторое время....')	
+	p = RabotauaParser(url='https://rabota.ua/jobsearch/vacancy_list?keyWords=', page='&pg=', message=message.text, chat_id=message.from_user.id)			
 	file = open(str(message.from_user.id) + '_-_' + str(message.text) + '.csv', 'rb')
 	bot.send_document(message.from_user.id, file)
 	delete_file(str(message.from_user.id)  + '_-_' + str(message.text) + '.csv')
