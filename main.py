@@ -81,7 +81,7 @@ def work_ua_command(message):
 
 def work_parser(message):
 	bot.send_message(message.from_user.id, 'Данные парсятся, это может занять некоторое время....')	
-	p = Parser(url='https://www.work.ua/jobs-', page='page=',message=message.text, chat_id=message.from_user.id)			
+	p = Parser(url='https://www.work.ua/jobs-', page='/?page=',message=message.text, chat_id=message.from_user.id)			
 	file = open(str(message.from_user.id) + '_-_' + str(message.text) + '.csv', 'rb')
 	bot.send_document(message.from_user.id, file)
 	delete_file(str(message.from_user.id)  + '_-_' + str(message.text) + '.csv')

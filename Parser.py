@@ -16,8 +16,8 @@ useragent = {'User-Agent': choice(read_file('useragent.txt'))}
 class Parser(object):
 	def __init__(self, url, page, message, chat_id):
 		self.message = message
-		self.url = url + str(self.message) + '/'
-		self.base_url = url + str(self.message) + '/'
+		self.url = url + str(self.message) 
+		self.base_url = url + str(self.message) 
 		self.page = page
 		self.chat_id = chat_id
 		self.workparse()
