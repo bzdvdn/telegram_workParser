@@ -14,7 +14,7 @@ __author__ = 'bzdvdn'
 bot = telebot.TeleBot(config.token)
 
 bot.remove_webhook()
-bot.set_webhook(url='https://c5423e1f.ngrok.io')
+bot.set_webhook(url='https://3e34da64.ngrok.io')
 
 
 
